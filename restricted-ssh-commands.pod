@@ -1,0 +1,86 @@
+=encoding utf8
+
+=head1 NAME
+
+restricted-ssh-commands - Restrict SSH users to a predefined set of commands
+
+=head1 SYNOPSIS
+
+B</usr/lib/restricted-ssh-commands> [I<config>]
+
+=head1 DESCRIPTION
+
+restricted-ssh-commands is intended to be called by SSH to restrict a
+user to only run specific commands. A list of allowed regular
+expressions can be configured in F</etc/restricted-ssh-commands/>. The
+requested command has to match at least one regular expression.
+Otherwise it will be rejected.
+
+restricted-ssh-commands is useful to grant restricted access via SSH to
+do only certain task. For example, it could allow a user to upload a Debian
+packages via scp and run reprepro processincoming.
+
+The optional I<config> parameter is the name of the configuration inside
+F</etc/restricted-ssh-commands/> that should be used. If I<config> is omitted,
+the user name will be used.
+
+=head1 USAGE
+
+Create a configuration file in F</etc/restricted-ssh-commands/$config> and add
+following line to F<~/.ssh/authorized_keys> to use it
+
+    command="/usr/lib/restricted-ssh-commands",no-port-forwarding,\
+    no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa [...]
+
+=head1 EXIT STATUS
+
+B<restricted-ssh-commands> will exit with the exit status from the called
+command if the command is allowed and therefore executed. If the command
+is rejected, B<restricted-ssh-commands> will exit with one of the following
+exit codes.
+
+=over 8
+
+=item C<124>
+
+A configuration file was found and contains at least one regular expression, but
+the requested command does not match any of those regular expressions.
+
+=item C<125>
+
+The configuration file is missing or does not contain any regular expressions.
+Thus all commands are rejected.
+
+=back
+
+=head1 EXAMPLES
+
+Imagine you have a Debian package repository on a host using reprepro and
+you want to allow package upload to it. Assuming the user is reprepro and the
+package configuration is stored in F</srv/reprepro>, you would create the
+configuration file F</etc/restricted-ssh-commands/reprepro> containing these
+three regular expressions:
+
+    ^scp -p( -d)? -t( --)? /srv/reprepro/incoming(/[^ /]*)?$
+    ^chmod 0644 /srv/reprepro/incoming/[^ /]*$
+    ^reprepro ( -V)? -b /srv/reprepro processincoming foobar$
+
+=head1 FILES
+
+The configuration files are placed in F</etc/restricted-ssh-commands/>. Each
+line in the configuration file represents one extended regular expression.
+Lines starting with # are considered as comments and are ignored. Empty lines
+(containing only whitespaces) are ignored, too.
+
+=head1 SEE ALSO
+
+Regular expressions on
+http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_04_01.html
+
+Section 9.4 Extended Regular Expressions (ERE) on
+http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap09.html
+
+=head1 AUTHOR
+
+B<restricted-ssh-commands> and this manpage have been written by Benjamin Drung
+<benjamin.drung@profitbricks.com>.

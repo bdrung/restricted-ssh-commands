@@ -1,0 +1,101 @@
+#!/bin/sh
+
+# Copyright (C) 2015, Benjamin Drung <benjamin.drung@profitbricks.com>
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+COMMAND="${0%/*}/test/restricted-ssh-commands"
+
+runCommand() {
+    local ssh_param="$1"
+    local param="$2"
+    local exp_stdout="$3"
+    local exp_stderr="$4"
+    local exp_retval=$5
+    local stdoutF="${SHUNIT_TMPDIR}/stdout"
+    local stderrF="${SHUNIT_TMPDIR}/stderr"
+    eval TEST_ROOT=${SHUNIT_TMPDIR} SSH_ORIGINAL_COMMAND="${ssh_param}" "${COMMAND} $param" > ${stdoutF} 2> ${stderrF}
+    retval=$?
+    assertEquals "standard output of ${COMMAND} $param\n" "$exp_stdout" "$(cat ${stdoutF})"
+    assertEquals "error output of ${COMMAND} $param\n" "$exp_stderr" "$(cat ${stderrF})"
+    assertEquals "return value of ${COMMAND} $param\n" $exp_retval $retval
+}
+
+add_rule() {
+    local config_name="$1"
+    local config_content="$2"
+    mkdir -p "${SHUNIT_TMPDIR}/etc/restricted-ssh-commands"
+    printf "%s\n" "$config_content" >> "${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/${config_name}"
+}
+
+success() {
+    runCommand "$1" "$2" "$3" "" ${4-0}
+}
+
+failure() {
+    runCommand "$1" "$2" "" "$3" ${4-124}
+}
+
+tearDown() {
+    rm -rf ${SHUNIT_TMPDIR}/etc
+}
+
+test_missing_config() {
+    failure "true" "foo" "restricted-ssh-commands: No configuration in ${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/foo. All commands are denied." 125
+}
+
+test_empty_config() {
+    add_rule "foo" ""
+    failure "true" "foo" "restricted-ssh-commands: Empty configuration in ${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/foo. All commands are denied." 125
+}
+
+test_single_rule_config() {
+    add_rule "$(id -un)" "^echo"
+    failure "true" "" "restricted-ssh-commands: Rejecting command \"true\". It does not match the one allow rule in ${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/$(id -un)."
+}
+
+test_two_rules_config() {
+    add_rule "bar" "^echo"
+    add_rule "bar" "^false"
+    failure "true" "bar" "restricted-ssh-commands: Rejecting command \"true\". It does not match any of the 2 allow rules in ${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/bar."
+}
+
+test_matching_rule() {
+    add_rule "foo" '^true$'
+    success "true" "foo" ""
+}
+
+test_user_config() {
+    add_rule "$(id -un)" '^true$'
+    success "true" "" ""
+}
+
+test_custom_config() {
+    add_rule "foobar" '^true$'
+    success "true" "foobar" ""
+}
+
+test_failing_command() {
+    add_rule "bla" '^true$'
+    add_rule "bla" '^false$'
+    failure "false" "bla" "" 1
+}
+
+. shunit2
