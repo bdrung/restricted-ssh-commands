@@ -1,0 +1,7 @@
+restricted-ssh-commands 0.2 (2015-10-07)
+
+* Fix passing the config to the command as stdin
+
+restricted-ssh-commands 0.1 (2015-10-02)
+
+* Initial release

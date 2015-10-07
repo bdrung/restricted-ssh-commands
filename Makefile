@@ -1,7 +1,7 @@
 PREFIX=/usr
 
-VERSION = 0.1
-DATE = 2015-10-02
+VERSION = 0.2
+DATE = 2015-10-07
 
 all:
 
@@ -25,7 +25,7 @@ install: doc
 	install -D -m 755 restricted-ssh-commands $(DESTDIR)$(PREFIX)/lib/restricted-ssh-commands
 	install -D -m 644 restricted-ssh-commands.1 $(DESTDIR)$(PREFIX)/share/man/man1/restricted-ssh-commands.1
 
-%.tar.xz: LICENSE Makefile restricted-ssh-commands restricted-ssh-commands.pod test-restricted-ssh-commands
+%.tar.xz: LICENSE Makefile NEWS restricted-ssh-commands restricted-ssh-commands.pod test-restricted-ssh-commands
 	tar -cJf $@ --transform 's,^,restricted-ssh-commands-$(VERSION)/,' $^
 
 dist: restricted-ssh-commands-$(VERSION).tar.xz
