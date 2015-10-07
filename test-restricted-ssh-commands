@@ -98,4 +98,9 @@ test_failing_command() {
     failure "false" "bla" "" 1
 }
 
+test_cat() {
+    add_rule "bla" '^cat'
+    echo test | success "cat" "bla" "test"
+}
+
 . shunit2
