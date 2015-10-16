@@ -68,9 +68,9 @@ three regular expressions:
 =head1 FILES
 
 The configuration files are placed in F</etc/restricted-ssh-commands/>. Each
-line in the configuration file represents one extended regular expression.
-Lines starting with # are considered as comments and are ignored. Empty lines
-(containing only whitespaces) are ignored, too.
+line in the configuration file represents one POSIX extended regular expression
+(ERE). Lines starting with # are considered as comments and are ignored. Empty
+lines (containing only whitespaces) are ignored, too.
 
 =head1 SEE ALSO
 
