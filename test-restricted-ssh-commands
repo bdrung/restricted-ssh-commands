@@ -31,7 +31,7 @@ runCommand() {
     local exp_retval=$5
     local stdoutF="${SHUNIT_TMPDIR}/stdout"
     local stderrF="${SHUNIT_TMPDIR}/stderr"
-    eval TEST_ROOT=${SHUNIT_TMPDIR} SSH_ORIGINAL_COMMAND="${ssh_param}" "${COMMAND} $param" > ${stdoutF} 2> ${stderrF}
+    TEST_ROOT=${SHUNIT_TMPDIR} SSH_ORIGINAL_COMMAND="${ssh_param}" "${COMMAND}" "$param" > ${stdoutF} 2> ${stderrF}
     retval=$?
     assertEquals "standard output of ${COMMAND} $param\n" "$exp_stdout" "$(cat ${stdoutF})"
     assertEquals "error output of ${COMMAND} $param\n" "$exp_stderr" "$(cat ${stderrF})"
@@ -101,6 +101,11 @@ test_failing_command() {
 test_cat() {
     add_rule "bla" '^cat'
     echo test | success "cat" "bla" "test"
+}
+
+test_shell_command() {
+    add_rule "user" '^export '
+    success 'export text=test; echo $text' "user" "test"
 }
 
 . shunit2

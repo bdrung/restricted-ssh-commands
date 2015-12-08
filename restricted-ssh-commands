@@ -83,4 +83,4 @@ if test -z "${found-}"; then
     fi
 fi
 
-exec "$@"
+exec ${SHELL:-/bin/sh} -c "${SSH_ORIGINAL_COMMAND-}"
