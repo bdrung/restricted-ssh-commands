@@ -33,8 +33,6 @@ if test -z "$config"; then
     fi
 fi
 
-set ${SSH_ORIGINAL_COMMAND-}
-
 config_file="/etc/restricted-ssh-commands/$config"
 if test ! -f "$config_file"; then
     msg="No configuration in $config_file. All commands are denied."
@@ -47,9 +45,9 @@ num_rules=0
 while IFS='' read -r line; do
     # Skip empty lines and lines starting with hashes
     if ! [[ "$line" =~ ^[[:space:]]*(#|$) ]]; then
-        if [[ "$@" =~ $line ]]; then
+        if [[ "${SSH_ORIGINAL_COMMAND-}" =~ $line ]]; then
             if test -n "${RSC_VERBOSE-}"; then
-                echo "${0##*/}: \"$@\" matches \"$line\"" >&2
+                echo "${0##*/}: \"${SSH_ORIGINAL_COMMAND-}\" matches \"$line\"" >&2
             fi
             found=1
             break
@@ -76,7 +74,7 @@ if test -z "${found-}"; then
         else
             msg="any of the $num_rules allow rules"
         fi
-        msg="Rejecting command \"$@\". It does not match $msg in $config_file."
+        msg="Rejecting command \"${SSH_ORIGINAL_COMMAND-}\". It does not match $msg in $config_file."
         echo "${0##*/}: $msg" >&2
         logger -t ${0##*/} -- "$msg"
         exit 124
