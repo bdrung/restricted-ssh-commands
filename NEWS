@@ -1,3 +1,9 @@
+restricted-ssh-commands 0.3 (2015-12-08)
+
+* doc: Clarify regular expression type (POSIX ERE)
+* Execute command in user's shell (instead of calling it directly)
+* Always print denied command
+
 restricted-ssh-commands 0.2 (2015-10-07)
 
 * Fix passing the config to the command as stdin
