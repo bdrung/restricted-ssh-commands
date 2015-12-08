@@ -58,12 +58,12 @@ tearDown() {
 }
 
 test_missing_config() {
-    failure "true" "foo" "restricted-ssh-commands: No configuration in ${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/foo. All commands are denied." 125
+    failure "true" "foo" "restricted-ssh-commands: No configuration in ${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/foo. All commands including \"true\" are denied." 125
 }
 
 test_empty_config() {
     add_rule "foo" ""
-    failure "true" "foo" "restricted-ssh-commands: Empty configuration in ${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/foo. All commands are denied." 125
+    failure "true" "foo" "restricted-ssh-commands: Empty configuration in ${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/foo. All commands including \"true\" are denied." 125
 }
 
 test_single_rule_config() {

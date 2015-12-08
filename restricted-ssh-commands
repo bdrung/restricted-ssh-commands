@@ -41,7 +41,7 @@ fi
 
 config_file="/etc/restricted-ssh-commands/$config"
 if test ! -f "$config_file"; then
-    log "No configuration in $config_file. All commands are denied."
+    log "No configuration in $config_file. All commands including \"${SSH_ORIGINAL_COMMAND-}\" are denied."
     exit 125
 fi
 
@@ -68,7 +68,7 @@ done < "$config_file"
 
 if test -z "${found-}"; then
     if test "$num_rules" -eq 0; then
-        log "Empty configuration in $config_file. All commands are denied."
+        log "Empty configuration in $config_file. All commands including \"${SSH_ORIGINAL_COMMAND-}\" are denied."
         exit 125
     else
         if test "$num_rules" -eq 1; then
