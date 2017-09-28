@@ -61,9 +61,25 @@ package configuration is stored in F</srv/reprepro>, you would create the
 configuration file F</etc/restricted-ssh-commands/reprepro> containing these
 three regular expressions:
 
-    ^scp -p( -d)? -t( --)? /srv/reprepro/incoming(/[^ /]*)?$
-    ^chmod 0644 /srv/reprepro/incoming/[^ /]*$
+    ^scp -p( -d)? -t( --)? /srv/reprepro/incoming(/[-a-z0-9+~_.]*)?$
+    ^chmod 0644( /srv/reprepro/incoming/[-a-z0-9+~_.]*)+$
     ^reprepro ( -V)? -b /srv/reprepro processincoming foobar$
+
+=head1 SECURITY NOTES
+
+It is dangerous and not recommended to use negative bracket expressions
+(like [^ /]). Characters like CR LF $ & ; ( ) and so on can be abused to execute
+arbitrary commands. For example, the rule
+
+    ^echo [^ /]$
+
+can be abused to execute these commands
+
+    echo foo&echo owned
+    echo foo&rm -rf $(printf "\x2f")
+
+where a TAB is used instead of spaces after the first ampersand. Therefore
+only use positive bracked expressions (like [a-z]).
 
 =head1 FILES
 
