@@ -32,6 +32,11 @@ following line to F<~/.ssh/authorized_keys> to use it
     command="/usr/lib/restricted-ssh-commands",no-port-forwarding,\
     no-X11-forwarding,no-agent-forwarding,no-pty ssh-rsa [...]
 
+To enable debug output, set the RSC_VERBOSE environment variable to a nonzero
+value, e.g. by adding it to authorized_keys:
+
+    command="RSC_VERBOSE=1 /usr/lib/restricted-ssh-commands"
+
 =head1 EXIT STATUS
 
 B<restricted-ssh-commands> will exit with the exit status from the called
