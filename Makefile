@@ -1,7 +1,7 @@
 PREFIX=/usr
 
-VERSION = 0.3
-DATE = 2015-12-08
+VERSION = 0.4
+DATE = 2017-09-29
 
 all:
 

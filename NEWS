@@ -1,3 +1,8 @@
+restricted-ssh-commands 0.4 (2017-09-29)
+
+* Fix unsecure example configuration in man page (fixes #4, Debian #876392)
+* Document how to enable debug output
+
 restricted-ssh-commands 0.3 (2015-12-08)
 
 * doc: Clarify regular expression type (POSIX ERE)
