@@ -66,8 +66,8 @@ package configuration is stored in F</srv/reprepro>, you would create the
 configuration file F</etc/restricted-ssh-commands/reprepro> containing these
 three regular expressions:
 
-    ^scp -p( -d)? -t( --)? /srv/reprepro/incoming(/[-a-z0-9+~_.]*[-a-z0-9+~_])?$
-    ^chmod 0644( /srv/reprepro/incoming/[-a-z0-9+~_.]*[-a-z0-9+~_])+$
+    ^scp -p( -d)? -t( --)? /srv/reprepro/incoming(/[-A-Za-z0-9+~_.]*[-A-Za-z0-9+~_])?$
+    ^chmod 0644( /srv/reprepro/incoming/[-A-Za-z0-9+~_.]*[-A-Za-z0-9+~_])+$
     ^reprepro ( -V)? -b /srv/reprepro processincoming foobar$
 
 =head1 SECURITY NOTES
