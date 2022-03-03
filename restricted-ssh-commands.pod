@@ -36,6 +36,10 @@ To enable debug output, set the RSC_VERBOSE environment variable to a nonzero
 value, e.g. by adding it to authorized_keys:
 
     command="RSC_VERBOSE=1 /usr/lib/restricted-ssh-commands"
+    
+It is also possible to use the ForceCommand parameter in /etc/ssh/sshd_config:
+
+    ForceCommand /usr/lib/restricted-ssh-commands
 
 =head1 EXIT STATUS
 
@@ -49,7 +53,8 @@ exit codes.
 =item C<124>
 
 A configuration file was found and contains at least one regular expression, but
-the requested command does not match any of those regular expressions.
+the requested command does not match any of those regular expressions, or also
+matches one or more negated expression (indicated with a leading !).
 
 =item C<125>
 
@@ -69,6 +74,7 @@ three regular expressions:
     ^scp -p( -d)? -t( --)? /srv/reprepro/incoming(/[-A-Za-z0-9+~_.]*[-A-Za-z0-9+~_])?$
     ^chmod 0644( /srv/reprepro/incoming/[-A-Za-z0-9+~_.]*[-A-Za-z0-9+~_])+$
     ^reprepro ( -V)? -b /srv/reprepro processincoming foobar$
+    !(badname1|badname2)
 
 =head1 SECURITY NOTES
 
@@ -90,8 +96,10 @@ only use positive bracked expressions (like [a-z]).
 
 The configuration files are placed in F</etc/restricted-ssh-commands/>. Each
 line in the configuration file represents one POSIX extended regular expression
-(ERE). Lines starting with # are considered as comments and are ignored. Empty
-lines (containing only whitespaces) are ignored, too.
+(ERE). Line starting with ! are negative matching lines, the ! is stripped and
+if the remaining ERE matches the command, it is rejected. Lines starting with #
+are considered as comments and are ignored. Empty lines (containing only
+whitespaces) are ignored, too.
 
 =head1 SEE ALSO
 
