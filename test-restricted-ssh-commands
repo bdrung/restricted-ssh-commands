@@ -77,6 +77,12 @@ test_two_rules_config() {
     failure "true" "bar" "restricted-ssh-commands: Rejecting command \"true\". It does not match any of the 2 allow rules in ${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/bar."
 }
 
+test_negation_rule() {
+    add_rule "bar" '^true$'
+    add_rule "bar" '!ru'
+    failure "true" "bar" "restricted-ssh-commands: Rejecting command \"true\". It matches a negative rule in ${SHUNIT_TMPDIR}/etc/restricted-ssh-commands/bar."
+}
+
 test_matching_rule() {
     add_rule "foo" '^true$'
     success "true" "foo" ""
